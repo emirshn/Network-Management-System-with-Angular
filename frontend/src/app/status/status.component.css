@@ -1,0 +1,8 @@
+.down-device {
+    background-color: lightcoral; /* Light red color for down devices */
+  }
+  
+  .active-device {
+    background-color: lightgreen; /* Light green color for active devices */
+  }
+  

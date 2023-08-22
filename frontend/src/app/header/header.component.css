@@ -1,0 +1,12 @@
+.navbar {
+  background-color: var(--bgColor-light);
+  color: var(--textColor-light);
+  border-color: var(--borderColor-light);
+}
+
+/* Styles for the dark mode */
+body.dark .navbar {
+  background-color: var(--bgColor-dark);
+  color: var(--textColor-dark);
+  border-color: var(--borderColor-dark);
+}

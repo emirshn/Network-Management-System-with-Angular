@@ -1,0 +1,345 @@
+<div class="container mt-5">
+  <h1 class="text-center">Device Management</h1>
+
+  <div class="row mt-4">
+    <div class="col">
+      <h2>Device List</h2>
+      <div class="form-group">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Search by name, IP, MAC..."
+          [(ngModel)]="searchText"
+          (ngModelChange)="applyFilter()"
+        />
+      </div>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>IP Address</th>
+            <th>MAC Address</th>
+            <th>Manufacturer</th>
+            <th>Model</th>
+            <th>Device Type</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let device of paginatedDeviceList">
+            <td>{{ device.name }}</td>
+            <td>{{ device.ip_address }}</td>
+            <td>{{ device.mac_address }}</td>
+            <td>{{ device.manufacturer }}</td>
+            <td>{{ device.model }}</td>
+            <td>{{ device.device_type }}</td>
+            <td>
+              <button
+                *ngIf="userHasUpdatePermission(device)"
+                class="btn btn-primary"
+                (click)="openUpdateForm(device)"
+              >
+                Update
+              </button>
+
+              <button
+                *ngIf="userHasUpdatePermission(device)"
+                class="btn btn-primary"
+                (click)="deleteDevice(device.id)"
+              >
+                Delete
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <ul class="pagination">
+        <li class="page-item" *ngFor="let page of pages">
+          <a
+            class="page-link"
+            href="javascript:void(0);"
+            (click)="changePage(page)"
+            >{{ page }}</a
+          >
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="row mt-5 justify-content-center" *ngIf="showUpdateForm">
+    <div class="col-md-6">
+      <h2 class="text-center">Update Device</h2>
+      <form [formGroup]="updateForm" (submit)="updateDevice()">
+        <div class="form-group">
+          <label for="updateName">Name</label>
+          <input
+            type="text"
+            id="updateName"
+            class="form-control"
+            formControlName="name"
+          />
+
+          <label for="updateIP">IP Address</label>
+          <input
+            type="text"
+            id="updateIP"
+            class="form-control"
+            formControlName="ip"
+          />
+
+          <label for="updateMAC">MAC Address</label>
+          <input
+            type="text"
+            id="updateMAC"
+            class="form-control"
+            formControlName="mac"
+          />
+
+          <label for="updateManufacturer">Manufacturer</label>
+          <input
+            type="text"
+            id="updateManufacturer"
+            class="form-control"
+            formControlName="manufacturer"
+          />
+
+          <label for="updateModel">Model</label>
+          <input
+            type="text"
+            id="updateModel"
+            class="form-control"
+            formControlName="model"
+          />
+
+          <label for="updateDeviceType">Device Type</label>
+          <input
+            type="text"
+            id="updateDeviceType"
+            class="form-control"
+            formControlName="device_type"
+          />
+        </div>
+
+        <div class="text-center">
+          <button type="submit" class="btn btn-success">Update</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="row mt-4">
+    <div class="col-md-6">
+      <button
+        *ngIf="userHasAddPermission()"
+        class="btn btn-primary"
+        (click)="showAddForm = !showAddForm"
+      >
+        Add Device
+      </button>
+      <form *ngIf="showAddForm" (submit)="addDevice()" [formGroup]="addForm">
+        <div class="form-group">
+          <label for="addName">Name</label>
+          <input
+            type="text"
+            id="addName"
+            class="form-control"
+            formControlName="name"
+          />
+
+          <label for="addIP">IP Adress</label>
+          <input
+            type="text"
+            id="addIP"
+            class="form-control"
+            formControlName="ip"
+          />
+          <div
+            *ngIf="
+              addForm?.get('ip')?.invalid &&
+              (addForm?.get('ip')?.dirty || addForm?.get('ip')?.touched)
+            "
+          >
+            <small class="text-danger">
+              Please enter a valid IP address (e.g., 192.168.1.1)
+            </small>
+          </div>
+
+          <label for="addMAC">MAC Adress</label>
+          <input
+            type="text"
+            id="addMAC"
+            class="form-control"
+            formControlName="mac"
+          />
+          <div
+            *ngIf="
+              addForm?.get('mac')?.invalid &&
+              (addForm?.get('mac')?.dirty || addForm?.get('mac')?.touched)
+            "
+          >
+            <small class="text-danger">
+              Please enter a valid MAC address (e.g., 00:1A:2B:3C:4D:5E)
+            </small>
+          </div>
+          <label for="addDeviceType">Device Type</label>
+          <select
+            id="addDeviceType"
+            class="form-control"
+            formControlName="device_type"
+            (change)="onDeviceTypeChange()"
+          >
+            <option
+              *ngFor="let deviceType of deviceTypes"
+              [ngValue]="deviceType"
+            >
+              {{ deviceType.name }}
+            </option>
+          </select>
+
+          <label for="addManufacturer">Manufacturer</label>
+          <select
+            id="addManufacturer"
+            class="form-control"
+            formControlName="manufacturer"
+            (change)="onManufacturerChange()"
+          >
+            <option
+              *ngFor="let manufacturer of filteredManufacturers"
+              [ngValue]="manufacturer"
+            >
+              {{ manufacturer.name }}
+            </option>
+          </select>
+
+          <label for="addModel">Model</label>
+          <select id="addModel" class="form-control" formControlName="model">
+            <option *ngFor="let model of filteredModels" [ngValue]="model">
+              {{ model.model_name }}
+            </option>
+          </select>
+          <!-- <label for="addManufacturer">Manufacturer</label>
+          <input
+            type="text"
+            id="addManufacturer"
+            class="form-control"
+            formControlName="manufacturer"
+          />
+
+          <label for="addModel">Model</label>
+          <input
+            type="text"
+            id="addModel"
+            class="form-control"
+            formControlName="model"
+          />
+          <label for="addDeviceType">Device Type</label>
+          <input
+            type="text"
+            id="addDeviceType"
+            class="form-control"
+            formControlName="device_type"
+          /> -->
+        </div>
+
+        <div class="text-center">
+          <button
+            type="submit"
+            class="btn btn-success"
+            [disabled]="addForm.invalid"
+          >
+            Add
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <h1 class="text-center">Connection Management</h1>
+
+  <div class="row mt-4">
+    <div class="col">
+      <h2>Links List</h2>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Source Device</th>
+            <th>Target Device</th>
+            <th>Bandwidth</th>
+            <th>Latency</th>
+            <th>Traffic</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let link of linkList">
+            <td>{{ link.source_device }}</td>
+            <td>{{ link.target_device }}</td>
+            <td>{{ link.bandwidth }}</td>
+            <td>{{ link.latency }}</td>
+            <td>{{ link.traffic }}</td>
+            <td>
+              <button class="btn btn-primary">Update</button>
+              <button class="btn btn-primary">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="row mt-4">
+    <div class="col-md-6">
+      <button
+        *ngIf="userHasAddPermission()"
+        class="btn btn-primary"
+        (click)="showLinkForm = !showLinkForm"
+      >
+        Create Link
+      </button>
+      <form *ngIf="showLinkForm" [formGroup]="linkForm" (submit)="createLink()">
+        <div class="form-group">
+          <label for="sourceDevice">Source Device</label>
+          <select
+            id="sourceDevice"
+            class="form-control"
+            formControlName="sourceDevice"
+            (change)="onDeviceSelectionChange($event, 'source')"
+          >
+            <option *ngFor="let device of getAvailableTargetDevices(selectedTargetDeviceId!)" [value]="device.id">
+              {{ device.name }}
+            </option>
+          </select>
+
+          <label for="targetDevice">Target Device</label>
+          <select
+            id="targetDevice"
+            class="form-control"
+            formControlName="targetDevice"
+            (change)="onDeviceSelectionChange($event, 'target')"
+          >
+            <option
+              *ngFor="
+                let device of getAvailableTargetDevices(selectedSourceDeviceId!)
+              "
+              [value]="device.id"
+            >
+              {{ device.name }}
+            </option>
+          </select>
+
+          <label for="bandwidth">Bandwidth</label>
+          <input
+            type="text"
+            id="bandwidth"
+            class="form-control"
+            formControlName="bandwidth"
+          />
+        </div>
+
+        <div class="text-center">
+          <button type="submit" class="btn btn-success">Create Link</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

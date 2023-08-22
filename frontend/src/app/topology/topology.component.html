@@ -1,0 +1,58 @@
+<div class="container">
+  <div class="row">
+    <div class="col-md-9">
+      <div #svgContainer></div>
+    </div>
+    <div class="col-md-3">
+      <div class="thumbnail">
+        <div class="caption text-center">
+          <p>&nbsp;Node Details</p>
+          <div class="thumbnail-description smaller">
+            <div *ngIf="selectedNode">
+              <p><strong>Name:</strong> {{ selectedNode.name }}</p>
+              <p><strong>IP Address:</strong> {{ selectedNode.ip_address }}</p>
+              <p>
+                <strong>MAC Address:</strong> {{ selectedNode.mac_address }}
+              </p>
+              <p><strong>Device Type:</strong> {{ selectedNode.device_type }}</p>
+              <p>
+                <strong>Manufacturer:</strong> {{ selectedNode.manufacturer }}
+              </p>
+              <p><strong>Device Model:</strong> {{ selectedNode.model }}</p>
+              <p><strong>Status:</strong> {{ selectedNode.status }}</p>
+              <p><strong>Connected Devices:</strong></p>
+              <select class="form-control" [(ngModel)]="selectedConnectedNode">
+                <option
+                  *ngFor="
+                    let connectedNode of getConnectedNodes(selectedNode.id)
+                  "
+                >
+                  {{ connectedNode }}
+                </option>
+              </select>
+              <div style="margin-top: 10px"></div>
+
+              <button
+                class="btn"
+                [ngClass]="
+                  selectedNode?.status === 'active'
+                    ? 'btn-danger'
+                    : 'btn-success'
+                "
+                (click)="toggleActivation()"
+              >
+                {{
+                  selectedNode?.status === "active" ? "Deactivate" : "Activate"
+                }}
+              </button>
+
+            </div>
+            <div *ngIf="!selectedNode">
+              <p>Select a node to see details.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,38 @@
+/* You can add global styles to this file, and also import other style files */
+@import "~leaflet/dist/leaflet.css";
+
+:root {
+  --bgColor-light: white;
+  --textColor-light: black;
+  --borderColor-light: black;
+
+  --bgColor-dark: rgb(83, 83, 83);
+  --textColor-dark: white;
+  --borderColor-dark: white;
+}
+
+body.light {
+  background-color: var(--bgColor-light);
+  color: var(--textColor-light);
+  border-color: var(--borderColor-light);
+}
+
+body.dark {
+  background-color: var(--bgColor-dark);
+  color: var(--textColor-dark);
+  border-color: var(--borderColor-dark);
+}
+
+button {
+  font-family: "Space Mono", monospace;
+}
+
+main {
+  display: flex;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background-color: var(--bgColor);
+  color: var(--textColor);
+}
